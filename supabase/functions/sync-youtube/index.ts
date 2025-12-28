@@ -4,7 +4,16 @@ const YOUTUBE_API_KEY = Deno.env.get('YOUTUBE_API_KEY')
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
-Deno.serve(async (req: Request) => {
+interface SyncReport {
+    region: string;
+    cat?: string;
+    format?: string;
+    status: string;
+    message?: string;
+    count?: number;
+}
+
+Deno.serve(async () => {
     try {
         const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -35,7 +44,7 @@ Deno.serve(async (req: Request) => {
             { id: 'economy', ytId: '25' },
         ];
 
-        const report: any[] = [];
+        const report: SyncReport[] = [];
         let totalCreated = 0;
         const formats = ['long', 'shorts'];
 
@@ -70,7 +79,7 @@ Deno.serve(async (req: Request) => {
                             continue;
                         }
 
-                        const channelIds = items.map((i: any) => i.snippet.channelId);
+                        const channelIds = items.map((i: { snippet: { channelId: string } }) => i.snippet.channelId);
                         const chUrl = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${channelIds.join(',')}&key=${YOUTUBE_API_KEY}`;
                         const chRes = await fetch(chUrl);
                         const chData = await chRes.json();
@@ -100,8 +109,9 @@ Deno.serve(async (req: Request) => {
                             }
                             report.push({ region, cat: cat.id, format, status: 'success', count: chData.items.length });
                         }
-                    } catch (e: any) {
-                        report.push({ region, cat: cat.id, format, status: 'fatal', message: e.message });
+                    } catch (e) {
+                        const message = e instanceof Error ? e.message : String(e);
+                        report.push({ region, cat: cat.id, format, status: 'fatal', message });
                     }
                 }
 
@@ -122,7 +132,8 @@ Deno.serve(async (req: Request) => {
             totalCreated,
             report
         }), { headers: { 'Content-Type': 'application/json' } })
-    } catch (err: any) {
-        return new Response(JSON.stringify({ error: err.message }), { status: 500 })
+    } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        return new Response(JSON.stringify({ error: message }), { status: 500 })
     }
 })

@@ -34,7 +34,28 @@ export async function fetchCreatorsFromDB(weights: HotWeights = DEFAULT_WEIGHTS)
         }));
     }
 
-    const creators: Creator[] = data.map((item: any) => {
+    interface CreatorAnalyticsRow {
+        id: string;
+        category_id: string;
+        region_code: string;
+        format_type?: 'long' | 'shorts';
+        name: string;
+        handle?: string;
+        description?: string;
+        channel_url: string;
+        thumbnail_url?: string;
+        tags?: string[];
+        why?: string[];
+        current_subs: number;
+        current_views: number;
+        current_videos: number;
+        subs_delta_7d: number;
+        views_delta_7d: number;
+        last_updated_at: string;
+        admin_boost?: number;
+    }
+
+    const creators: Creator[] = (data as unknown as CreatorAnalyticsRow[]).map((item) => {
         const statsForScore = {
             subscribers: item.current_subs,
             totalViews: item.current_views,

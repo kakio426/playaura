@@ -22,11 +22,11 @@ export function GrowthChart({ stats, color = "#ef4444" }: GrowthChartProps) {
             date.setDate(date.getDate() - i);
 
             const dayProgress = (6 - i) / 6; // 0 to 1
-            const randomFluctuation = (Math.random() - 0.5) * (delta * 0.1); // 10% 변동성
+            // const randomFluctuation = (Math.random() - 0.5) * (delta * 0.1); // 10% 변동성 (Removed for lint purity)
 
             // 7일 전 값 = 현재 값 - 7일 증가분
             // 현재 값으로 갈수록 증가
-            const estimatedSubs = Math.round((currentSubs - delta) + (delta * dayProgress) + randomFluctuation);
+            const estimatedSubs = Math.round((currentSubs - delta) + (delta * dayProgress));
 
             points.push({
                 date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
@@ -58,7 +58,7 @@ export function GrowthChart({ stats, color = "#ef4444" }: GrowthChartProps) {
                         contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '8px', fontSize: '12px' }}
                         itemStyle={{ color: '#fff' }}
                         labelStyle={{ color: '#a1a1aa' }}
-                        formatter={(value: any) => [new Intl.NumberFormat('en-US', { notation: "compact", maximumFractionDigits: 1 }).format(Number(value) || 0), 'Subs']}
+                        formatter={(value: number | string | undefined) => [new Intl.NumberFormat('en-US', { notation: "compact", maximumFractionDigits: 1 }).format(Number(value) || 0), 'Subs']}
                     />
                     <Area
                         type="monotone"

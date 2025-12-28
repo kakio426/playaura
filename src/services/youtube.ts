@@ -8,7 +8,7 @@ export async function getPopularChannelIds(categoryId: string, maxResults = 20) 
 
     if (data.error) throw new Error(data.error.message);
 
-    const channelIds = data.items.map((item: any) => item.snippet.channelId);
+    const channelIds = data.items.map((item: { snippet: { channelId: string } }) => item.snippet.channelId);
     return [...new Set(channelIds)] as string[];
 }
 
@@ -21,7 +21,20 @@ export async function getChannelsDetails(channelIds: string[]) {
 
     if (data.error) throw new Error(data.error.message);
 
-    return data.items.map((item: any) => ({
+    return data.items.map((item: {
+        id: string;
+        snippet: {
+            title: string;
+            customUrl: string;
+            description: string;
+            thumbnails: { medium: { url: string } }
+        };
+        statistics: {
+            subscriberCount: string;
+            viewCount: string;
+            videoCount: string;
+        }
+    }) => ({
         id: item.id,
         name: item.snippet.title,
         handle: item.snippet.customUrl,

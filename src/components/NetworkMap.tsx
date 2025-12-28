@@ -34,14 +34,18 @@ export function NetworkMap({ creators, onClose }: NetworkGraphProps) {
         const topCreators = [...creators].sort((a, b) => b.hotScore - a.hotScore).slice(0, 50);
         const activeIds = new Set(topCreators.map(c => c.id));
 
-        const gNodes = topCreators.map((c) => ({
-            ...c,
-            x: (Math.random() - 0.5) * 1200,
-            y: (Math.random() - 0.5) * 900,
-            vx: 0,
-            vy: 0,
-            size: (c.hotScore / 100) * 80 + 60 // Influence-based sizing
-        }));
+        const gNodes = topCreators.map((c, i) => {
+            const angle = (i / topCreators.length) * Math.PI * 2;
+            const radius = 200 + (i * 10);
+            return {
+                ...c,
+                x: Math.cos(angle) * radius,
+                y: Math.sin(angle) * radius,
+                vx: 0,
+                vy: 0,
+                size: (c.hotScore / 100) * 80 + 60 // Influence-based sizing
+            };
+        });
 
         const gLinks: GraphLink[] = [];
         topCreators.forEach(c => {
@@ -57,7 +61,7 @@ export function NetworkMap({ creators, onClose }: NetworkGraphProps) {
 
     // 2. Simple Force-Directed Simulation
     useEffect(() => {
-        let currentNodes = nodes.map(n => ({ ...n }));
+        const currentNodes = nodes.map(n => ({ ...n }));
 
         const tick = () => {
             const centerX = 0;

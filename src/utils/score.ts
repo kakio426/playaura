@@ -85,7 +85,7 @@ export function computeHot(stats: ChannelStats, weights: HotWeights, options: Sc
     const adminBoost = options.adminBoost || 1.0;
     const categoryWeight = options.categoryWeight || 1.0;
 
-    let finalHot = rawHot * adminBoost * categoryWeight;
+    const finalHot = rawHot * adminBoost * categoryWeight;
 
     return {
         hotScore: clamp(Math.round(finalHot), 0, 100),

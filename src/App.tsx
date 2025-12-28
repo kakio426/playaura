@@ -130,10 +130,10 @@ export default function App() {
             </div>
 
             <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 p-1.5 rounded-2xl mb-12 w-fit">
-              {['all', 'long', 'shorts'].map(f => (
+              {(['all', 'long', 'shorts'] as const).map(f => (
                 <button
                   key={f}
-                  onClick={() => setActiveFormat(f as any)}
+                  onClick={() => setActiveFormat(f)}
                   className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${activeFormat === f
                     ? 'bg-black dark:bg-white text-white dark:text-black shadow-lg'
                     : 'c-text-dim hover:c-text-main'
