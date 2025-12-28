@@ -114,7 +114,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[var(--bg-color)] c-text-main transition-colors duration-200">
       <div className="aura-container"><div className="aura-blob" /></div>
-      <Header stats={stats} theme={theme} onToggleTheme={toggleTheme} />
+      <Header stats={stats} theme={theme} onToggleTheme={toggleTheme} onOpenNetwork={() => setView('network')} />
 
       <Helmet><title>PlayAura</title></Helmet>
 

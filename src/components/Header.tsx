@@ -1,4 +1,4 @@
-import { Youtube, Activity, Globe, Sun, Moon } from 'lucide-react';
+import { Youtube, Activity, Globe, Sun, Moon, Share2 } from 'lucide-react';
 
 interface HeaderProps {
     stats: {
@@ -8,12 +8,14 @@ interface HeaderProps {
     };
     theme: 'light' | 'dark';
     onToggleTheme: () => void;
+    onOpenNetwork: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
     stats,
     theme,
-    onToggleTheme
+    onToggleTheme,
+    onOpenNetwork
 }) => {
     const formatNum = (num: number) => new Intl.NumberFormat().format(num);
 
@@ -49,6 +51,17 @@ export const Header: React.FC<HeaderProps> = ({
                             </div>
                         </div>
                     </div>
+
+                    <div className="h-6 sm:h-8 w-px bg-black/5 dark:bg-white/10" />
+
+                    {/* Network Map Toggle */}
+                    <button
+                        onClick={onOpenNetwork}
+                        className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-red-600/10 dark:bg-red-500/10 rounded-xl sm:rounded-2xl border border-red-500/20 hover:bg-red-600/20 dark:hover:bg-red-500/20 transition-all active:scale-95 group"
+                    >
+                        <Share2 size={14} className="text-red-500 sm:w-[16px] sm:h-[16px]" />
+                        <span className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-red-600 dark:text-red-500">Network</span>
+                    </button>
 
                     <div className="h-6 sm:h-8 w-px bg-black/5 dark:bg-white/10" />
 

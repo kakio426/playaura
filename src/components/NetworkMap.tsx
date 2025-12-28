@@ -21,6 +21,16 @@ interface GraphLink {
     target: string;
 }
 
+const CATEGORY_COLORS: Record<string, string> = {
+    entertainment: '#3b82f6', // blue
+    gaming: '#8b5cf6',        // violet
+    education: '#10b981',     // emerald
+    tech: '#ef4444',          // red
+    music: '#f59e0b',         // amber
+    lifestyle: '#ec4899',     // pink
+    economy: '#06b6d4'        // cyan
+};
+
 export function NetworkMap({ creators, onClose }: NetworkGraphProps) {
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [scale, setScale] = useState(0.7);
@@ -34,16 +44,27 @@ export function NetworkMap({ creators, onClose }: NetworkGraphProps) {
         const topCreators = [...creators].sort((a, b) => b.hotScore - a.hotScore).slice(0, 50);
         const activeIds = new Set(topCreators.map(c => c.id));
 
+        // Find min/max scores to create a relative scale
+        const scores = topCreators.map(c => c.hotScore);
+        const minS = Math.min(...scores);
+        const maxS = Math.max(...scores);
+        const scoreRange = maxS - minS || 1;
+
         const gNodes = topCreators.map((c, i) => {
             const angle = (i / topCreators.length) * Math.PI * 2;
-            const radius = 200 + (i * 10);
+            const radius = 350 + (i * 20); // Spread out more
+
+            // Relative scaling: map current min-max to 60px - 180px
+            const relativeScore = (c.hotScore - minS) / scoreRange;
+            const size = 60 + (relativeScore * 120);
+
             return {
                 ...c,
                 x: Math.cos(angle) * radius,
                 y: Math.sin(angle) * radius,
                 vx: 0,
                 vy: 0,
-                size: (c.hotScore / 100) * 80 + 60 // Influence-based sizing
+                size
             };
         });
 
@@ -187,11 +208,12 @@ export function NetworkMap({ creators, onClose }: NetworkGraphProps) {
                     style={{ scale }}
                 >
                     {/* SVG WEB LINES */}
-                    <svg className="absolute inset-0 w-[4000px] h-[3000px] -left-[2000px] -top-[1500px] overflow-visible pointer-events-none opacity-20">
+                    <svg className="absolute inset-0 w-[4000px] h-[3000px] -left-[2000px] -top-[1500px] overflow-visible pointer-events-none z-10">
                         {links.map((link, i) => {
                             const source = simNodes.find(n => n.id === link.source);
                             const target = simNodes.find(n => n.id === link.target);
                             if (!source || !target) return null;
+                            const color = CATEGORY_COLORS[source.categoryId] || '#fff';
                             return (
                                 <line
                                     key={i}
@@ -199,9 +221,10 @@ export function NetworkMap({ creators, onClose }: NetworkGraphProps) {
                                     y1={1500 + source.y}
                                     x2={2000 + target.x}
                                     y2={1500 + target.y}
-                                    stroke="white"
-                                    strokeWidth="1.5"
-                                    strokeDasharray="4 4"
+                                    stroke={color}
+                                    strokeWidth="2"
+                                    strokeDasharray="6 4"
+                                    opacity="0.5"
                                 />
                             );
                         })}
@@ -227,10 +250,17 @@ export function NetworkMap({ creators, onClose }: NetworkGraphProps) {
                                     style={{ width: node.size, height: node.size }}
                                 >
                                     <div className={`relative w-full h-full rounded-full transition-all duration-500 ${isSelected
-                                        ? 'ring-4 ring-red-500 ring-offset-4 ring-offset-black scale-110 z-50 shadow-[0_0_50px_rgba(239,68,68,0.4)]'
-                                        : 'hover:ring-4 hover:ring-white/20'
-                                        }`}>
-                                        <div className="w-full h-full rounded-full overflow-hidden border border-white/10 bg-[#111]">
+                                        ? 'ring-4 ring-offset-4 ring-offset-black scale-110 z-50'
+                                        : 'hover:ring-4'
+                                        }`}
+                                        style={{
+                                            boxShadow: isSelected ? `0 0 50px ${CATEGORY_COLORS[node.categoryId]}66` : 'none',
+                                        }}
+                                    >
+                                        <div
+                                            className="w-full h-full rounded-full overflow-hidden border-2 bg-[#111]"
+                                            style={{ borderColor: CATEGORY_COLORS[node.categoryId] || 'rgba(255,255,255,0.1)' }}
+                                        >
                                             <img
                                                 src={node.thumbnail_url}
                                                 className={`w-full h-full object-cover transition-all duration-700 ${isSelected ? 'grayscale-0' : 'grayscale group-hover:grayscale-0'
@@ -238,8 +268,13 @@ export function NetworkMap({ creators, onClose }: NetworkGraphProps) {
                                                 alt=""
                                             />
                                         </div>
-                                        <div className={`absolute -bottom-1 -right-1 px-2 py-0.5 rounded-lg border text-[8px] font-black ${node.hotScore > 85 ? 'bg-red-600 border-red-400' : 'bg-white/10 border-white/20'
-                                            }`}>
+                                        <div
+                                            className="absolute -bottom-1 -right-1 px-2 py-0.5 rounded-lg border text-[8px] font-black text-white"
+                                            style={{
+                                                backgroundColor: CATEGORY_COLORS[node.categoryId] || '#333',
+                                                borderColor: 'rgba(255,255,255,0.2)'
+                                            }}
+                                        >
                                             {node.hotScore} IQ
                                         </div>
                                     </div>
