@@ -12,17 +12,18 @@
 @variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 :root {
-  /* Light Theme */
-  --bg-color: #ffffff;
-  --text-main: #000000;
-  --text-muted: #333333;
-  --text-dim: #666666;
+  /* Light Theme - Modern Surface-based Contrast */
+  --bg-color: #f9fafb;
+  /* Slightly off-white for contrast */
+  --text-main: #111827;
+  --text-muted: #4b5563;
+  --text-dim: #9ca3af;
 
-  --glass-bg: rgba(255, 255, 255, 0.9);
-  --glass-border: rgba(0, 0, 0, 0.1);
-  --card-bg: #fdfdfd;
-  --card-border: #f0f0f0;
-  --aura-color: rgba(239, 68, 68, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --glass-border: rgba(0, 0, 0, 0.12);
+  --card-bg: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.05);
+  --aura-color: rgba(239, 68, 68, 0.04);
 
   color-scheme: light;
 }
@@ -75,12 +76,13 @@ body {
 .glass-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease;
 }
 
 .glass-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
 }
 
 /* PERFORMANCE: Simplified Aura (Faster Rendering) */
@@ -111,6 +113,9 @@ body {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
+  padding: 0.1em 0;
+  /* Add padding to prevent clipping at the edges */
+  margin: -0.1em 0;
 }
 
 .fade-in {

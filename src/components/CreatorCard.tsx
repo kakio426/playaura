@@ -28,6 +28,7 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({ creator, isFavorite, o
 
     return (
         <motion.div
+            id={`creator-${creator.id}`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             layout
@@ -144,15 +145,26 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({ creator, isFavorite, o
                     </div>
                 )}
 
-                <button
-                    onClick={() => setExpanded(!expanded)}
-                    className={`w-full py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${expanded
-                        ? 'bg-black dark:bg-white text-white dark:text-black shadow-lg'
-                        : 'bg-black/5 dark:bg-white/5 c-text-muted hover:c-text-main border border-black/5 dark:border-white/5'
-                        }`}
-                >
-                    {expanded ? 'Close Analytics' : 'Deep Analytics'}
-                </button>
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => setExpanded(!expanded)}
+                        className={`flex-1 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${expanded
+                            ? 'bg-black dark:bg-white text-white dark:text-black shadow-lg'
+                            : 'bg-black/5 dark:bg-white/5 c-text-muted hover:c-text-main border border-black/5 dark:border-white/5'
+                            }`}
+                    >
+                        {expanded ? 'Close Analytics' : 'Deep Analytics'}
+                    </button>
+                    <a
+                        href={creator.channelUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="p-3.5 rounded-xl bg-red-600/10 dark:bg-red-500/10 text-red-600 dark:text-red-500 border border-red-500/20 hover:bg-red-600 hover:text-white transition-all active:scale-95 flex items-center justify-center shadow-sm"
+                        title="Visit Channel"
+                    >
+                        <Youtube size={18} />
+                    </a>
+                </div>
             </div>
             <ShareModal creator={creator} isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} />
             {isVideoOpen && <VideoModal channelId={creator.id} channelName={creator.name} onClose={() => setIsVideoOpen(false)} />}

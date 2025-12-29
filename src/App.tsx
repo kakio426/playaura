@@ -123,7 +123,7 @@ export default function App() {
 
           <div className="flex-1 min-w-0">
             <div className="mb-12">
-              <h2 className="text-4xl lg:text-5xl font-black tracking-tighter italic mb-4">
+              <h2 className="text-4xl lg:text-5xl font-black tracking-tighter italic mb-4 leading-[1.1] py-2">
                 Discover <span className="gradient-text">Intelligence.</span>
               </h2>
               <p className="text-[10px] c-text-muted font-bold uppercase tracking-[0.2em]">Real-time Creator Analytics in {activeRegion}</p>
@@ -240,13 +240,25 @@ export default function App() {
               <span className="text-xs font-black uppercase tracking-widest c-text-main mb-8 block">Top Velocity</span>
               <div className="space-y-6">
                 {topCreators.map((c, i) => (
-                  <div key={c.id} className="flex items-center gap-4">
+                  <div
+                    key={c.id}
+                    className="flex items-center gap-4 cursor-pointer group hover:translate-x-1 transition-transform"
+                    onClick={() => {
+                      const element = document.getElementById(`creator-${c.id}`);
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // Trigger a temporary highlight effect or expansion if possible via state
+                        element.classList.add('ring-4', 'ring-red-500/50');
+                        setTimeout(() => element.classList.remove('ring-4', 'ring-red-500/50'), 2000);
+                      }
+                    }}
+                  >
                     <span className="text-lg font-black c-text-dim w-6">{(i + 1).toString().padStart(2, '0')}</span>
                     <div className="w-12 h-12 rounded-xl overflow-hidden bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 flex-shrink-0">
-                      {c.thumbnail_url ? <img src={c.thumbnail_url} className="w-full h-full object-cover grayscale" alt="" /> : <div className="w-full h-full flex items-center justify-center c-text-dim">👤</div>}
+                      {c.thumbnail_url ? <img src={c.thumbnail_url} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" alt="" /> : <div className="w-full h-full flex items-center justify-center c-text-dim">👤</div>}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-[13px] font-bold truncate c-text-main">{c.name}</h4>
+                      <h4 className="text-[13px] font-bold truncate c-text-main group-hover:text-red-500 transition-colors">{c.name}</h4>
                       <p className="text-[10px] font-mono c-text-muted">🔥 {c.hotScore} • <span className="text-green-600">+{c.breakdown.growthRate.toFixed(1)}x</span></p>
                     </div>
                   </div>
