@@ -2,6 +2,7 @@ import { supabase } from '../lib/supabase';
 import type { Creator, HotWeights } from '../types';
 import { DEFAULT_WEIGHTS, computeHot } from '../utils/score';
 import { CATEGORY_WEIGHTS } from '../constants';
+import { isCorporateChannel } from '../utils/filtering';
 
 /**
  * DB의 creator_analytics 뷰에서 계산된 데이터를 가져옵니다.
@@ -93,21 +94,26 @@ export async function fetchCreatorsFromDB(weights: HotWeights = DEFAULT_WEIGHTS)
         };
     });
 
+
+
+    // Apply Corporate Filtering
+    const filteredCreators = creators.filter(c => !isCorporateChannel(c));
+
     // --- Optimized Correlation Engine ---
     // Instead of N^2 full regex matching, we use a lighter category + keyword approach
     // We only process if N is reasonable to avoid blocking the main thread too long
-    if (creators.length > 500) return creators;
+    if (filteredCreators.length > 500) return filteredCreators;
 
     // Pre-calculate word sets for all creators to avoid repetitive regex work
-    const creatorWordSets = creators.map(c => ({
+    const creatorWordSets = filteredCreators.map(c => ({
         id: c.id,
         words: new Set((c.description + ' ' + c.name).toLowerCase().match(/\w{3,}/g) || [])
     }));
 
-    return creators.map((current, idx) => {
+    return filteredCreators.map((current, idx) => {
         const currentWords = creatorWordSets[idx].words;
 
-        const relatedIds = creators
+        const relatedIds = filteredCreators
             .map((other, oIdx) => {
                 if (current.id === other.id) return { id: other.id, score: -1 };
 

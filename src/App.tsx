@@ -109,7 +109,7 @@ export default function App() {
   }, []);
 
   if (view === 'terms') return <Terms onBack={() => setView('dashboard')} />;
-  if (view === 'network') return <NetworkMap creators={creators} onClose={() => setView('dashboard')} />;
+  if (view === 'network') return <NetworkMap creators={creators} onClose={() => setView('dashboard')} activeCategoryId={activeCategoryId} activeRegion={activeRegion} />;
 
   return (
     <div className="min-h-screen bg-[var(--bg-color)] c-text-main transition-colors duration-200">
@@ -129,14 +129,15 @@ export default function App() {
               <p className="text-[10px] c-text-muted font-bold uppercase tracking-[0.2em]">Real-time Creator Analytics in {activeRegion}</p>
             </div>
 
-            <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 p-1.5 rounded-2xl mb-12 w-fit">
+            {/* Format Toggles - Improved Light Mode Visibility */}
+            <div className="flex items-center gap-2 bg-neutral-100 dark:bg-white/5 p-1.5 rounded-2xl mb-12 w-fit border border-neutral-200 dark:border-white/5">
               {(['all', 'long', 'shorts'] as const).map(f => (
                 <button
                   key={f}
                   onClick={() => setActiveFormat(f)}
                   className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${activeFormat === f
-                    ? 'bg-black dark:bg-white text-white dark:text-black shadow-lg'
-                    : 'c-text-dim hover:c-text-main'
+                    ? 'bg-white dark:bg-white text-black shadow-md border border-neutral-200 dark:border-transparent'
+                    : 'text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white'
                     }`}
                 >
                   {f === 'all' ? '✨ All' : f === 'long' ? '🎬 Long' : '⚡ Shorts'}
@@ -176,9 +177,9 @@ export default function App() {
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setActiveCategoryId('favorites')}
-                  className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${activeCategoryId === 'favorites'
-                    ? 'bg-red-500 text-white'
-                    : 'bg-black/5 dark:bg-white/5 c-text-muted'
+                  className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all border ${activeCategoryId === 'favorites'
+                    ? 'bg-red-500 text-white border-red-500 shadow-lg shadow-red-500/20'
+                    : 'bg-neutral-100 dark:bg-white/5 text-neutral-500 dark:text-neutral-400 border-transparent hover:bg-neutral-200 dark:hover:bg-white/10'
                     }`}
                 >
                   ❤️ Watchlist
@@ -187,9 +188,9 @@ export default function App() {
                   <button
                     key={cat.id}
                     onClick={() => setActiveCategoryId(cat.id)}
-                    className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${activeCategoryId === cat.id
-                      ? 'bg-black dark:bg-white text-white dark:text-black'
-                      : 'bg-black/5 dark:bg-white/5 c-text-muted'
+                    className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all border ${activeCategoryId === cat.id
+                      ? 'bg-black dark:bg-white text-white dark:text-black shadow-lg border-black dark:border-white'
+                      : 'bg-neutral-100 dark:bg-white/5 text-neutral-500 dark:text-neutral-400 border-transparent hover:bg-neutral-200 dark:hover:bg-white/10'
                       }`}
                   >
                     {cat.icon} {cat.name}

@@ -3,9 +3,20 @@ import { supabase } from '../lib/supabase';
 /**
  * 접속 시 방문 기록을 남깁니다.
  */
+// Session Key for duplicate prevention
+const VISIT_SESSION_KEY = 'playaura_has_visited_v1';
+
 export async function recordVisit() {
+    // 1. Check Session Storage (Prevent counting on refresh)
+    if (sessionStorage.getItem(VISIT_SESSION_KEY)) {
+        return;
+    }
+
     try {
-        // 비동기로 던지고 기다리지 않음
+        // 2. Mark session as visited
+        sessionStorage.setItem(VISIT_SESSION_KEY, 'true');
+
+        // 3. Record to DB (Fire and Forget)
         supabase.from('site_visits').insert({}).then(() => { });
     } catch (e) {
         console.error('Visit recording failed:', e);

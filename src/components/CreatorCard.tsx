@@ -4,6 +4,7 @@ import { TrendingUp, Users, Video, Heart, Youtube, Zap, Share2 } from 'lucide-re
 import { motion, AnimatePresence } from 'framer-motion';
 import { GrowthChart } from './GrowthChart';
 import { ShareModal } from './ShareModal';
+import { VideoModal } from './VideoModal';
 
 interface CreatorCardProps {
     creator: Creator;
@@ -22,6 +23,7 @@ const formatNumber = (n?: number) => {
 export const CreatorCard: React.FC<CreatorCardProps> = ({ creator, isFavorite, onToggleFavorite, relatedCreators }) => {
     const [expanded, setExpanded] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+    const [isVideoOpen, setIsVideoOpen] = useState(false);
     const isHot = creator.hotScore >= 80;
 
     return (
@@ -32,13 +34,11 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({ creator, isFavorite, o
             className={`glass-card flex flex-col p-5 rounded-[2rem] h-full overflow-hidden transition-all duration-300 ${expanded ? 'ring-2 ring-red-500/30' : ''}`}
         >
             {/* Thumbnail */}
-            <div className="relative w-full aspect-video rounded-2xl overflow-hidden mb-5 bg-black/10 dark:bg-white/5 border border-black/5 dark:border-white/5 group">
-                <a
-                    href={creator.channelUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="block w-full h-full"
-                >
+            <div
+                className="relative w-full aspect-video rounded-2xl overflow-hidden mb-5 bg-black/10 dark:bg-white/5 border border-black/5 dark:border-white/5 group cursor-pointer"
+                onClick={() => setIsVideoOpen(true)}
+            >
+                <div className="block w-full h-full">
                     {creator.thumbnail_url ? (
                         <img
                             src={creator.thumbnail_url}
@@ -55,7 +55,7 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({ creator, isFavorite, o
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <Youtube className="text-white transform scale-50 group-hover:scale-100 transition-transform" size={48} fill="currentColor" />
                     </div>
-                </a>
+                </div>
 
                 {onToggleFavorite && (
                     <button
@@ -155,6 +155,7 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({ creator, isFavorite, o
                 </button>
             </div>
             <ShareModal creator={creator} isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} />
+            {isVideoOpen && <VideoModal channelId={creator.id} channelName={creator.name} onClose={() => setIsVideoOpen(false)} />}
         </motion.div>
     );
 };

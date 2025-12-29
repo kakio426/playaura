@@ -6,6 +6,8 @@ import type { Creator } from '../types';
 interface NetworkGraphProps {
     creators: Creator[];
     onClose: () => void;
+    activeCategoryId: string;
+    activeRegion: string;
 }
 
 interface GraphNode extends Creator {
@@ -31,7 +33,7 @@ const CATEGORY_COLORS: Record<string, string> = {
     economy: '#06b6d4'        // cyan
 };
 
-export function NetworkMap({ creators, onClose }: NetworkGraphProps) {
+export function NetworkMap({ creators, onClose, activeCategoryId, activeRegion }: NetworkGraphProps) {
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [scale, setScale] = useState(0.7);
     const [simNodes, setSimNodes] = useState<GraphNode[]>([]);
@@ -40,8 +42,19 @@ export function NetworkMap({ creators, onClose }: NetworkGraphProps) {
 
     // 1. Initialize Nodes and Links based on strict Filtered Context
     const { nodes, links } = useMemo(() => {
+        // Filter creators based on active context
+        let filteredCreators = [...creators];
+
+        if (activeRegion && activeRegion !== 'all') {
+            filteredCreators = filteredCreators.filter(c => c.region_code === activeRegion);
+        }
+
+        if (activeCategoryId && activeCategoryId !== 'all') {
+            filteredCreators = filteredCreators.filter(c => c.categoryId === activeCategoryId);
+        }
+
         // Limit to top 50 for performance and clarity
-        const topCreators = [...creators].sort((a, b) => b.hotScore - a.hotScore).slice(0, 50);
+        const topCreators = filteredCreators.sort((a, b) => b.hotScore - a.hotScore).slice(0, 50);
         const activeIds = new Set(topCreators.map(c => c.id));
 
         // Find min/max scores to create a relative scale
