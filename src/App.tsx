@@ -86,6 +86,7 @@ export default function App() {
 
     res.sort((a, b) => {
       if (sortKey === 'hot') return b.hotScore - a.hotScore;
+      if (sortKey === 'new') return (b.createdAt || 0) - (a.createdAt || 0); // Recent first
       if (sortKey === 'subs') return (b.stats.subscribers || 0) - (a.stats.subscribers || 0);
       if (sortKey === 'growth') return b.breakdown.growthRate - a.breakdown.growthRate;
       return 0;
@@ -158,7 +159,7 @@ export default function App() {
               </div>
 
               <div className="flex items-center gap-1 bg-black/5 dark:bg-white/5 p-1 rounded-xl">
-                {(['hot', 'subs', 'growth'] as SortKey[]).map(key => (
+                {(['hot', 'new', 'subs', 'growth'] as SortKey[]).map(key => (
                   <button
                     key={key}
                     onClick={() => setSortKey(key)}

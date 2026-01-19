@@ -29,18 +29,54 @@ Deno.serve(async () => {
         // 수집할 국가 정의
         const regions = ['US', 'KR', 'JP', 'IN', 'BR', 'ID', 'MX'];
 
-        // 지역별 검색어 최적화 (PlayAura Intelligence에 최적화)
+        // 지역별 검색어 최적화 (PlayAura Intelligence에 최적화) - 랜덤 로테이션 적용
         const getQuery = (ourId: string, region: string) => {
-            const queries: Record<string, Record<string, string>> = {
-                KR: { entertainment: '예능 인기 급상승', gaming: '게임 하이라이트 트랜드', education: '자기계발 지식', tech: '언박싱 IT 리뷰', music: '뮤직비디오 인기', lifestyle: '브이로그 추천', economy: '주식 경제 전망' },
-                JP: { entertainment: 'バラエティ 人気', gaming: 'ゲーム実況 トレンド', education: '教養 知識', tech: 'ガジェット レビュー', music: 'ミュージックビデオ', lifestyle: '日常 VLOG', economy: '経済 ニュース 投資' },
-                IN: { entertainment: 'trending entertainment india', gaming: 'gaming highlights india', education: 'upsc science knowledge', tech: 'gadget review hindi', music: 'new hindi songs', lifestyle: 'family vlogs india', economy: 'indian stock market' },
-                BR: { entertainment: 'entretenimento brasil trending', gaming: 'lives de games brasil', education: 'ciência e curiosidades', tech: 'tech review brasil', music: 'musica brasileira', lifestyle: 'vlogs brasileiros', economy: 'economia brasil' },
-                ID: { entertainment: 'hiburan populer indonesia', gaming: 'game seru indonesia', education: 'belajar teknologi', tech: 'review gadget indonesia', music: 'lagu hits indonesia', lifestyle: 'vlog harian', economy: 'ekonomi bisnis indonesia' },
-                MX: { entertainment: 'entretenimiento popular', gaming: 'partidas de juegos', education: 'educación y ciencia', tech: 'reseña de tecnología', music: 'musica mexicana', lifestyle: 'vlogs de vida', economy: 'economía méxico' },
-                US: { entertainment: 'entertainment trending', gaming: 'gaming highlights', education: 'documentary deep dive', tech: 'tech gadgets review', music: 'trending music videos', lifestyle: 'lifestyle vlogs', economy: 'global economy market' }
+            const queries: Record<string, Record<string, string[]>> = {
+                KR: {
+                    entertainment: ['예능 인기 급상승', '재미있는 영상 추천', '화제의 예능', '웃긴 동영상 모음', '최신 예능 레전드', '유튜브 인기 예능'],
+                    gaming: ['게임 하이라이트', '최신 모바일 게임', '인기 게임 유튜버', '게임 공략 실황', '롤 하이라이트', '마인크래프트 건축'],
+                    education: ['자기계발', '지식 채널', '역사 다큐멘터리', '과학 상식', '영어 공부', '동기부여 영상'],
+                    tech: ['IT 기기 리뷰', '최신 스마트폰 언박싱', '테크 유튜버', '컴퓨터 조립 추천', '가전제품 추천', '신기한 전자기기'],
+                    music: ['최신 인기가요', '노래방 인기곡', '플레이리스트 추천', '라이브 영상', '뮤직비디오 해석', '아이돌 직캠'],
+                    lifestyle: ['브이로그 일상', '여행 유튜버 추천', '맛집 탐방', '자취 요리', '다이어트 식단', '룸투어'],
+                    economy: ['주식 투자 전망', '재테크 꿀팁', '부동산 시황', '경제 뉴스 해설', '비트코인 전망', '부자되는 법']
+                },
+                JP: {
+                    entertainment: ['バラエティ 人気', '面白い動画', '話題の動画'],
+                    gaming: ['ゲーム実況', '新作ゲーム', 'マイクラ 実況'],
+                    education: ['教養', '学び', '歴史解説', '英語学習'],
+                    tech: ['ガジェット レビュー', 'スマホ 比較', 'PC 自作'],
+                    music: ['人気曲', '作業用BGM', '歌ってみた'],
+                    lifestyle: ['日常Vlog', '一人暮らし', 'ルーティン'],
+                    economy: ['投資 初心者', '株主優待', '節約術']
+                },
+                IN: {
+                    entertainment: ['trending entertainment', 'funny videos hindi', 'latest comedy'],
+                    gaming: ['gaming highlights india', 'bgmi gameplay', 'minecraft hindi'],
+                    education: ['upsc preparation', 'science facts hindi', 'gk questions'],
+                    tech: ['tech review hindi', 'best smartphone under', 'gadget unboxing'],
+                    music: ['new hindi songs', 'bollywood hits', 'punjabi songs'],
+                    lifestyle: ['lifestyle vlog hindi', 'indian family vlog', 'street food india'],
+                    economy: ['stock market hindi', 'investment tips', 'business ideas']
+                },
+                // Fallback for others (Simplified)
+                US: {
+                    entertainment: ['trending entertainment', 'viral videos', 'must watch funny'],
+                    gaming: ['gaming highlights', 'let\'s play', 'esports moments'],
+                    education: ['educational documentary', 'science explained', 'history facts'],
+                    tech: ['tech review', 'latest gadgets', 'smartphone comparison'],
+                    music: ['new music video', 'live performance', 'top hits'],
+                    lifestyle: ['daily vlog', 'travel vlog', 'morning routine'],
+                    economy: ['stock market analysis', 'personal finance tips', 'crypto news']
+                }
             };
-            return queries[region]?.[ourId] || queries['US'][ourId];
+
+            const regionQueries = queries[region] || queries['US'];
+            const categoryQueries = regionQueries[ourId] || queries['US'][ourId] || ['trending'];
+
+            // 배열에서 랜덤하게 하나 선택
+            const randomIndex = Math.floor(Math.random() * categoryQueries.length);
+            return categoryQueries[randomIndex];
         };
 
         const categories = [
@@ -59,13 +95,19 @@ Deno.serve(async () => {
         for (const region of regions) {
             console.log(`[Quota Saver Sync] Starting Region: ${region}...`);
 
+            // 7일 전 날짜 계산 (새로운 콘텐츠 발굴용)
+            const d = new Date();
+            d.setDate(d.getDate() - 7);
+            const publishedAfter = d.toISOString();
+
             for (const cat of categories) {
                 try {
                     // 1. 통합 검색 (100점) - maxResults를 늘려 검색 효율 극대화
                     const searchQuery = getQuery(cat.id, region);
                     const lang = region === 'KR' ? 'ko' : region === 'JP' ? 'ja' : region === 'IN' ? 'hi' : region === 'BR' ? 'pt' : region === 'ID' ? 'id' : region === 'MX' ? 'es' : 'en';
 
-                    const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(searchQuery)}&type=video&videoCategoryId=${cat.ytId}&regionCode=${region}&relevanceLanguage=${lang}&maxResults=25&key=${YOUTUBE_API_KEY}`;
+                    // publishedAfter 파라미터 추가하여 최신 영상 위주로 검색
+                    const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(searchQuery)}&type=video&videoCategoryId=${cat.ytId}&regionCode=${region}&relevanceLanguage=${lang}&publishedAfter=${publishedAfter}&maxResults=25&key=${YOUTUBE_API_KEY}`;
                     const searchRes = await fetch(searchUrl);
                     const searchData = await searchRes.json();
 

@@ -48,9 +48,10 @@ export type Creator = {
     lastUpdatedAt: number;
     format_type?: 'long' | 'shorts';
     relatedIds?: string[];
+    createdAt?: number;
 };
 
-export type SortKey = "hot" | "subs" | "growth";
+export type SortKey = "hot" | "subs" | "growth" | "new";
 
 export type HotWeights = {
     wA: number;

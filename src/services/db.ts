@@ -54,6 +54,7 @@ export async function fetchCreatorsFromDB(weights: HotWeights = DEFAULT_WEIGHTS)
         views_delta_7d: number;
         last_updated_at: string;
         admin_boost?: number;
+        created_at?: string;
     }
 
     const creators: Creator[] = (data as unknown as CreatorAnalyticsRow[]).map((item) => {
@@ -90,7 +91,8 @@ export async function fetchCreatorsFromDB(weights: HotWeights = DEFAULT_WEIGHTS)
             stats: statsForScore,
             hotScore,
             breakdown,
-            lastUpdatedAt: new Date(item.last_updated_at).getTime()
+            lastUpdatedAt: new Date(item.last_updated_at).getTime(),
+            createdAt: item.created_at ? new Date(item.created_at).getTime() : 0
         };
     });
 
